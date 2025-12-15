@@ -1,12 +1,10 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+// src/App.jsx
+import { Routes, Route, Link } from "react-router-dom";
 import { useState } from "react";
 import LeadList from "./components/LeadList";
 import LeadDetail from "./components/LeadDetail";
 import LeadForm from "./components/LeadForm";
 
-{
-  /* HomePage component */
-}
 function HomePage() {
   return (
     <div className="container">
@@ -29,6 +27,7 @@ function HomePage() {
 
 function App() {
   const [leads, setLeads] = useState([]);
+
   const addLead = (lead) => {
     setLeads((prev) => [
       ...prev,
@@ -39,17 +38,16 @@ function App() {
       },
     ]);
   };
+
   return (
-    <BrowserRouter>
-      <div className="app-root">
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/leads" element={<LeadList leads={leads} />} />
-          <Route path="/leads/new" element={<LeadForm onSubmit={addLead} />} />
-          <Route path="/leads/:id" element={<LeadDetail leads={leads} />} />
-        </Routes>
-      </div>
-    </BrowserRouter>
+    <div className="app-root">
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/leads" element={<LeadList leads={leads} />} />
+        <Route path="/leads/new" element={<LeadForm onSubmit={addLead} />} />
+        <Route path="/leads/:id" element={<LeadDetail leads={leads} />} />
+      </Routes>
+    </div>
   );
 }
 
