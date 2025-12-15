@@ -16,9 +16,9 @@ function HomePage() {
         >
           Mini Lead Management Dashboard
         </h1>
-        <a href="/leads" className="btn btn-primary">
+        <Link to="/leads" className="btn btn-primary">
           Go to Leads →
-        </a>
+        </Link>
         <p style={{ marginTop: "1rem", color: "#6b7280" }}>
           Manage and track your leads in one place.
         </p>
