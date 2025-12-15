@@ -1,10 +1,25 @@
-// src/App.jsx
 import { Routes, Route, Link } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import LeadList from "./components/LeadList";
 import LeadDetail from "./components/LeadDetail";
 import LeadForm from "./components/LeadForm";
+import LeadEditForm from "./components/LeadEditForm";
 
+const STORAGE_KEY = "leads";
+
+function getInitialLeads() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (e) {
+    console.error("Failed to parse leads from localStorage", e);
+    return [];
+  }
+}
+
+// Home page
 function HomePage() {
   return (
     <div className="container">
@@ -26,8 +41,18 @@ function HomePage() {
 }
 
 function App() {
-  const [leads, setLeads] = useState([]);
+  const [leads, setLeads] = useState(getInitialLeads);
 
+  // Save whenever leads change
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(leads));
+    } catch (e) {
+      console.error("Failed to save leads to localStorage", e);
+    }
+  }, [leads]);
+
+  // CREATE
   const addLead = (lead) => {
     setLeads((prev) => [
       ...prev,
@@ -39,13 +64,32 @@ function App() {
     ]);
   };
 
+  // UPDATE
+  const updateLead = (id, updates) => {
+    setLeads((prev) =>
+      prev.map((lead) => (lead.id === id ? { ...lead, ...updates } : lead)),
+    );
+  };
+
+  // DELETE
+  const deleteLead = (id) => {
+    setLeads((prev) => prev.filter((lead) => lead.id !== id));
+  };
+
   return (
     <div className="app-root">
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/leads" element={<LeadList leads={leads} />} />
+        <Route
+          path="/leads"
+          element={<LeadList leads={leads} onDelete={deleteLead} />}
+        />
         <Route path="/leads/new" element={<LeadForm onSubmit={addLead} />} />
         <Route path="/leads/:id" element={<LeadDetail leads={leads} />} />
+        <Route
+          path="/leads/:id/edit"
+          element={<LeadEditForm leads={leads} onSubmit={updateLead} />}
+        />
       </Routes>
     </div>
   );
