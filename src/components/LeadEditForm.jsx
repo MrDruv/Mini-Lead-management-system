@@ -51,7 +51,7 @@ export default function LeadEditForm({ leads, onSubmit }) {
     if (phone && !/^\d{10}$/.test(phone)) {
       newErrors.phone = "Enter valid phone number";
     }
-
+    if (!status) newErrors.status = "Status is required";
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
@@ -182,11 +182,23 @@ export default function LeadEditForm({ leads, onSubmit }) {
                   marginTop: "0.25rem",
                 }}
               >
+                <option value="">Select</option>
                 <option value="NEW">NEW</option>
                 <option value="IN_PROGRESS">IN_PROGRESS</option>
                 <option value="CLOSED">CLOSED</option>
               </select>
             </label>
+            {errors.status && (
+              <div
+                style={{
+                  color: "#dc2626",
+                  fontSize: "0.8rem",
+                  marginTop: "0.25rem",
+                }}
+              >
+                {errors.status}
+              </div>
+            )}
           </div>
 
           {/* Notes */}

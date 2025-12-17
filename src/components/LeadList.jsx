@@ -7,20 +7,28 @@ import ConfirmDialog from "./ConfirmDialog";
 export default function LeadList({ leads, onDelete }) {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("ALL"); // NEW
   const [deleteId, setDeleteId] = useState(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const filteredLeads = useMemo(() => {
     const q = search.toLowerCase();
-    if (!q) return leads;
+
     return leads.filter((lead) => {
-      return (
+      const matchesSearch =
+        !q ||
         (lead.name && lead.name.toLowerCase().includes(q)) ||
         (lead.phone && lead.phone.toLowerCase().includes(q)) ||
-        (lead.status && lead.status.toLowerCase().includes(q))
-      );
+        (lead.notes && lead.notes.toLowerCase().includes(q));
+
+      const matchesStatus =
+        statusFilter === "ALL" ||
+        (lead.status &&
+          lead.status.toLowerCase() === statusFilter.toLowerCase());
+
+      return matchesSearch && matchesStatus;
     });
-  }, [leads, search]);
+  }, [leads, search, statusFilter]); // include statusFilter
 
   const handleDeleteClick = (id) => {
     setDeleteId(id);
@@ -52,7 +60,7 @@ export default function LeadList({ leads, onDelete }) {
       <p className="page-subtitle">Track and manage your incoming leads.</p>
 
       <div className="leads-card">
-        {/* header row: label + search on right */}
+        {/* header row: label + filters on right */}
         <div
           style={{
             display: "flex",
@@ -71,16 +79,40 @@ export default function LeadList({ leads, onDelete }) {
             Lead list
           </span>
 
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search..."
+          <div
             style={{
-              padding: "0.4rem 0.6rem",
-              minWidth: "200px",
+              display: "flex",
+              gap: "0.5rem",
+              alignItems: "center",
             }}
-          />
+          >
+            {/* status dropdown */}
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              style={{
+                padding: "0.35rem 0.5rem",
+                fontSize: "0.85rem",
+              }}
+            >
+              <option value="ALL">All</option>
+              <option value="NEW">NEW</option>
+              <option value="IN_PROGRESS">IN_PROGRESS</option>
+              <option value="CLOSED">CLOSED</option>
+            </select>
+
+            {/* text search */}
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search..."
+              style={{
+                padding: "0.4rem 0.6rem",
+                minWidth: "200px",
+              }}
+            />
+          </div>
         </div>
 
         {filteredLeads.length === 0 ? (
@@ -143,7 +175,6 @@ export default function LeadList({ leads, onDelete }) {
         </Link>
       </div>
 
-      {/* reusable delete confirmation dialog */}
       <ConfirmDialog
         open={confirmOpen}
         title="Delete lead?"
